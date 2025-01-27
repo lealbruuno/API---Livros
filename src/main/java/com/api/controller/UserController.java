@@ -3,7 +3,8 @@ package com.api.controller;
 // Importações necessárias para o funcionamento da aplicação
 import org.springframework.http.ResponseEntity;  // Utilizado para criar respostas HTTP
 import org.springframework.web.bind.annotation.*;  // Anotações que definem os endpoints da API
-import com.api.dto.UserDTO;  // Importa a classe UserDTO que é um objeto de transferência de dados do usuário
+import com.api.dto.UserRegisterDTO;  // Importa a classe UserRegisterDTO que é um objeto de transferência de dados do usuário
+import com.api.dto.UserUpdateDTO;  // Importa a classe UserUpdateDTO que é um objeto de transferência de dados do usuário
 import com.api.security.JwtUtil;  // Importa a classe que gerencia a criação e validação de tokens JWT
 import com.api.service.UserService;  // Importa o serviço de usuários que contém a lógica de negócios
 import com.api.model.User;  // Importa o modelo de dados que representa um usuário no banco de dados
@@ -33,15 +34,15 @@ public class UserController {
      * Endpoint para registrar um novo usuário.
      * Esse método recebe os dados do usuário, tenta registrá-lo e retorna uma resposta apropriada.
      * 
-     * @param userDTO Dados do usuário para registrar (enviados no corpo da requisição).
+     * @param userRegisterDTO Dados do usuário para registrar (enviados no corpo da requisição).
      * @return Retorna um ResponseEntity com o status e a mensagem correspondente.
      */
     @PostMapping("/register")  // Mapeia a URL "/register" para este método com o método HTTP POST.
-    public ResponseEntity<?> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> register(@RequestBody UserRegisterDTO userRegisterDTO) {
         try {
             // Tenta registrar o usuário chamando o método do serviço que processa o registro.
-            // O userDTO contém os dados enviados no corpo da requisição.
-            userService.registerUser(userDTO);
+            // O userRegisterDTO contém os dados enviados no corpo da requisição.
+            userService.registerUser(userRegisterDTO);
             // Se o registro for bem-sucedido, retorna uma resposta com status 200 OK e uma mensagem de sucesso.
             return ResponseEntity.ok("Usuário registrado com sucesso!");
         } catch (IllegalArgumentException e) {
@@ -55,16 +56,16 @@ public class UserController {
      * Endpoint para realizar o login do usuário.
      * Este método valida as credenciais e, se válidas, gera um token JWT.
      * 
-     * @param userDTO Contém o e-mail e senha do usuário para validação.
+     * @param userRegisterDTO Contém o e-mail e senha do usuário para validação.
      * @return Retorna o token JWT se as credenciais forem válidas, ou uma mensagem de erro caso contrário.
      */
     @PostMapping("/login")  // Mapeia a URL "/login" para este método com o método HTTP POST.
-    public ResponseEntity<?> login(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> login(@RequestBody UserRegisterDTO userRegisterDTO) {
         // Chama o serviço de usuários para validar as credenciais (e-mail e senha).
         // O método userService.validateUser verifica se as credenciais do usuário são corretas.
-        if (userService.validateUser(userDTO.email(), userDTO.password())) {
+        if (userService.validateUser(userRegisterDTO.email(), userRegisterDTO.password())) {
             // Se as credenciais forem válidas, gera um token JWT com base no e-mail do usuário.
-            String token = jwtUtil.generateToken(userDTO.email());
+            String token = jwtUtil.generateToken(userRegisterDTO.email());
             // Retorna o token gerado com status 200 OK.
             return ResponseEntity.ok(token);
         }
@@ -77,12 +78,12 @@ public class UserController {
      * Verifica se o usuário está autenticado usando o token JWT, e se for válido, atualiza as informações.
      * 
      * @param id O ID do usuário a ser atualizado (parte da URL).
-     * @param userDTO Os dados atualizados do usuário (enviados no corpo da requisição).
+     * @param userUpdateDTO Os dados atualizados do usuário (enviados no corpo da requisição).
      * @param request A requisição HTTP, usada para acessar o cabeçalho e obter o token JWT.
      * @return Retorna o usuário atualizado ou uma mensagem de erro dependendo do resultado.
      */
     @PutMapping("/user/{id}")  // Mapeia a URL "/user/{id}" para este método com o método HTTP PUT.
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO,
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO userUpdateDTO,
                                         HttpServletRequest request) {
         try {
             // Chama o método auxiliar 'extractToken' para obter o token JWT do cabeçalho da requisição.
@@ -109,7 +110,7 @@ public class UserController {
             }
 
             // Se as validações forem bem-sucedidas, chama o método do serviço para atualizar os dados do usuário.
-            UserDTO updatedUser = userService.updateUser(id, userDTO);
+            UserUpdateDTO updatedUser = userService.updateUser(id, userUpdateDTO);
             // Retorna os dados do usuário atualizado com status 200 OK.
             return ResponseEntity.ok(updatedUser);
 

@@ -3,7 +3,8 @@ package com.api.dto;  // Pacote onde o DTO (Data Transfer Object) do usuário es
 // Usando record para representar o DTO (Data Transfer Object)
 // Um record é uma forma especial de classe imutável, disponível a partir do Java 14.
 // Ele é usado para representar dados de forma compacta e simples, sem a necessidade de escrever muito código boilerplate.
-public record UserDTO(String name, String surname, String email, String password) {
+public record UserUpdateDTO(String name,String surname,String email,String telephone,String whatsapp,String address,String password) {
+
     // O record já gera automaticamente o construtor, os métodos getters, toString, equals e hashCode para os campos.
     // Não precisamos escrever explicitamente esses métodos, pois o record faz isso automaticamente.
     //
