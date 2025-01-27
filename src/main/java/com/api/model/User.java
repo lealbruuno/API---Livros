@@ -1,6 +1,7 @@
 package com.api.model;  // Pacote onde a classe User está localizada.
 
 import java.time.LocalDateTime;  // Importação para trabalhar com data e hora.
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;  // Anotação do Hibernate para marcar o campo que recebe a data/hora de criação.
 import org.hibernate.annotations.UpdateTimestamp;  // Anotação do Hibernate para marcar o campo que recebe a data/hora da última atualização.
@@ -65,4 +66,7 @@ public class User {
 
     @Column(name = "role", nullable = false)  // Define o nome da coluna como "role" e garante que não pode ser nula.
     private String role;  // Função ou papel do usuário (exemplo: "USER", "ADMIN").
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Pet> pets;  // Lista de pets vinculados ao usuário
 }

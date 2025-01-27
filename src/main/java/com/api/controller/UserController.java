@@ -1,26 +1,26 @@
-package com.api.controller;
+package com.api.controller; // Pacote onde a classe UserController está localizada.
 
-// Importações necessárias para o funcionamento da aplicação
-import org.springframework.http.ResponseEntity;  // Utilizado para criar respostas HTTP
-import org.springframework.web.bind.annotation.*;  // Anotações que definem os endpoints da API
-import com.api.dto.UserRegisterDTO;  // Importa a classe UserRegisterDTO que é um objeto de transferência de dados do usuário
-import com.api.dto.UserUpdateDTO;  // Importa a classe UserUpdateDTO que é um objeto de transferência de dados do usuário
-import com.api.security.JwtUtil;  // Importa a classe que gerencia a criação e validação de tokens JWT
-import com.api.service.UserService;  // Importa o serviço de usuários que contém a lógica de negócios
-import com.api.model.User;  // Importa o modelo de dados que representa um usuário no banco de dados
-import com.api.repository.UserRepository;  // Importa o repositório que faz a comunicação com o banco de dados
+import org.springframework.http.ResponseEntity;  // Utilizado para criar respostas HTTP.
+import org.springframework.web.bind.annotation.*;  // Anotações que definem os endpoints da API.
+import com.api.dto.UserRegisterDTO;  // Importa a classe UserRegisterDTO que é um objeto de transferência de dados do usuário.
+import com.api.dto.UserUpdateDTO;  // Importa a classe UserUpdateDTO que é um objeto de transferência de dados do usuário.
+import com.api.dto.UserWithPetsDTO;  // Importa a classe UserWithPetsDTO que representa os dados do usuário com os pets vinculados.
+import com.api.security.JwtUtil;  // Importa a classe que gerencia a criação e validação de tokens JWT.
+import com.api.service.UserService;  // Importa o serviço de usuários que contém a lógica de negócios.
+import com.api.model.User;  // Importa o modelo de dados que representa um usuário no banco de dados.
+import com.api.repository.UserRepository;  // Importa o repositório que faz a comunicação com o banco de dados.
 
-import jakarta.servlet.http.HttpServletRequest;  // Necessário para acessar os dados da requisição HTTP
+import jakarta.servlet.http.HttpServletRequest;  // Necessário para acessar os dados da requisição HTTP.
 
 // Define esta classe como um controlador REST. Essa anotação indica que os métodos dentro dessa classe irão
-// lidar com as requisições HTTP (GET, POST, PUT, etc.)
+// lidar com as requisições HTTP (GET, POST, PUT, etc.).
 @RestController
 public class UserController {
 
     // Declaração das dependências necessárias para o funcionamento do controlador.
-    private final JwtUtil jwtUtil;  // Responsável pela geração e validação do token JWT
-    private final UserService userService;  // Contém a lógica de negócios para registrar e gerenciar usuários
-    private final UserRepository userRepository;  // Faz a interação com o banco de dados para acessar dados do usuário
+    private final JwtUtil jwtUtil;  // Responsável pela geração e validação do token JWT.
+    private final UserService userService;  // Contém a lógica de negócios para registrar e gerenciar usuários.
+    private final UserRepository userRepository;  // Faz a interação com o banco de dados para acessar dados do usuário.
 
     // Construtor da classe UserController. Ele recebe as dependências que o Spring irá injetar automaticamente.
     // Esse é o padrão de injeção de dependência do Spring (IoC - Inversão de Controle).
@@ -117,6 +117,28 @@ public class UserController {
         } catch (Exception e) {
             // Se qualquer erro acontecer durante o processo, retorna uma resposta 500 (Internal Server Error)
             // com a mensagem do erro.
+            return ResponseEntity.status(500).body("Erro interno: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Endpoint para buscar os dados do usuário e os pets vinculados.
+     * 
+     * @param id O ID do usuário a ser buscado (parte da URL).
+     * @return Retorna os dados do usuário e os pets vinculados com status 200 OK, ou uma mensagem de erro caso contrário.
+     */
+    @GetMapping("/user/{id}")  // Mapeia a URL "/user/{id}" para este método com o método HTTP GET.
+    public ResponseEntity<?> getUserWithPets(@PathVariable Long id) {
+        try {
+            // Chama o método do serviço para buscar os dados do usuário e os pets.
+            UserWithPetsDTO userWithPets = userService.getUserWithPets(id);
+            // Retorna os dados com status 200 OK.
+            return ResponseEntity.ok(userWithPets);
+        } catch (IllegalArgumentException e) {
+            // Se o usuário não for encontrado, retorna uma resposta 404 Not Found.
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            // Se ocorrer qualquer outro erro, retorna uma resposta 500 Internal Server Error.
             return ResponseEntity.status(500).body("Erro interno: " + e.getMessage());
         }
     }
